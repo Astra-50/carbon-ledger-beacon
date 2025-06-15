@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import UploadPage from "./pages/Upload";
 import ViolationSummary from "./pages/ViolationSummary";
+import LeaderboardPage from "./pages/Leaderboard";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/violations" element={<ViolationSummary />} />
+          <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
