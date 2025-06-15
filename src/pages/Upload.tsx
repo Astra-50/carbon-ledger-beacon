@@ -1,4 +1,3 @@
-
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
@@ -6,6 +5,8 @@ import { useRef, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import AuditResults from "@/components/AuditResults";
 import { parseCsv, AuditRow } from "@/utils/parseCsv";
+import UploadPanel from "@/components/UploadPanel";
+import { mockAuditEngine } from "@/utils/mockAuditEngine";
 
 const SAMPLE_CSV = `SKU,Supplier,Emissions (kg CO₂e)
 SKU1001,SustainableCo,1800
@@ -15,74 +16,16 @@ SKU1004,SupplierPlus,2100
 SKU1005,ZeroWaste,340
 `;
 
-function mockAuditEngine(rows: AuditRow[]) {
-  let totalEmissions = 0;
-  let missingSuppliers = 0;
-  let highEmissions = 0;
-  let zeroEmissions = 0;
-  let violations: { reason: string; affected: string }[] = [];
-  rows.forEach((row) => {
-    totalEmissions += row.Emissions;
-    if (!row.Supplier) {
-      missingSuppliers += 1;
-      violations.push({
-        reason: "Missing supplier name",
-        affected: row.SKU,
-      });
-    }
-    if (row.Emissions === 0) {
-      zeroEmissions += 1;
-      violations.push({
-        reason: "Zero emissions is non-compliant",
-        affected: row.SKU,
-      });
-    }
-    if (row.Emissions > 2000) {
-      highEmissions += 1;
-      violations.push({
-        reason: "High emissions (>2000 kg)",
-        affected: row.SKU,
-      });
-    }
-  });
-  // Compute a simple CarbonDebt Score (out of 100)
-  let score = 100 - missingSuppliers * 5 - highEmissions * 5 - zeroEmissions * 3;
-  score -= Math.floor(totalEmissions / 5000) * 7;
-  score = Math.max(30, Math.min(100, score));
-
-  // Estimate fines: €2000 per violation, plus flat €1500 if > 10k kg total
-  let estimatedFine = violations.length * 2000 + (totalEmissions > 10000 ? 1500 : 0);
-
-  return {
-    carbonDebt: score,
-    totalEmissions: Math.round(totalEmissions),
-    violations,
-    estimatedFine,
-    suggestions: [
-      ...(missingSuppliers > 0
-        ? ["Add all missing suppliers for better compliance."]
-        : []),
-      ...(highEmissions > 0
-        ? ["Investigate products with high emissions."]
-        : []),
-      ...(zeroEmissions > 0
-        ? ["Review entries reporting zero emissions; ensure data accuracy."]
-        : []),
-      ...(violations.length === 0
-        ? ["Great work! No critical issues. Stay compliant!"]
-        : []),
-    ],
-  };
-}
-
 export default function UploadPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [results, setResults] = useState<ReturnType<typeof mockAuditEngine> | null>(null);
   const [processing, setProcessing] = useState(false);
   const [fileName, setFileName] = useState<string | undefined>(undefined);
+  const [fileInputKey, setFileInputKey] = useState<number>(0); // for clearing input value
 
+  // Handlers
   const handleButtonClick = () => {
-    fileInputRef.current?.click();
+    document.querySelector<HTMLInputElement>('input[type="file"][data-testid="csv-input"]')?.click();
   };
 
   const handleSampleDownload = () => {
@@ -133,6 +76,7 @@ export default function UploadPage() {
       setProcessing(false);
     };
     reader.readAsText(file);
+    setFileInputKey(k => k + 1); // reset input after upload
   };
 
   return (
@@ -147,42 +91,12 @@ export default function UploadPage() {
             Upload a CSV file with your product SKUs and supplier emissions. Our engine flags violations and estimates your regulatory risk—no signup required.
           </p>
         </div>
-        <div className="w-full max-w-md rounded-lg border border-gray-200 bg-white shadow-md p-8 flex flex-col items-center gap-4">
-          <Upload className="text-accent mb-2" size={40} />
-          <Button
-            className="bg-accent text-white font-bold px-6 py-3 text-base transition-colors shadow hover:bg-accent/80"
-            onClick={handleButtonClick}
-            disabled={processing}
-          >
-            {processing ? "Processing..." : "Select CSV File"}
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv"
-            onChange={handleFileChange}
-            className="hidden"
-            data-testid="csv-input"
-            disabled={processing}
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSampleDownload}
-            type="button"
-            className="w-full mt-2"
-          >
-            Download Sample CSV
-          </Button>
-          <p className="text-sm text-muted-foreground mt-2">
-            Only <span className="font-mono">.csv</span> files accepted. Example columns:{" "}
-            <span className="font-mono text-primary bg-muted px-2 py-0.5 rounded">SKU</span>,{" "}
-            <span className="font-mono text-primary bg-muted px-2 py-0.5 rounded">Supplier</span>,{" "}
-            <span className="font-mono text-primary bg-muted px-2 py-0.5 rounded">
-              Emissions (kg CO₂e)
-            </span>
-          </p>
-        </div>
+        <UploadPanel
+          processing={processing}
+          onFileChange={handleFileChange}
+          onSampleDownload={handleSampleDownload}
+          onButtonClick={handleButtonClick}
+        />
         <div className="w-full max-w-xl mt-10 min-h-[80px]">
           {processing ? (
             <div className="text-center text-muted-foreground animate-pulse">Auditing your CSV data...</div>
