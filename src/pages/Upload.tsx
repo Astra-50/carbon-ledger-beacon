@@ -1,3 +1,4 @@
+
 import Navbar from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
@@ -7,11 +8,11 @@ import AuditResults from "@/components/AuditResults";
 import { parseCsv, AuditRow } from "@/utils/parseCsv";
 
 const SAMPLE_CSV = `SKU,Supplier,Emissions (kg CO₂e)
-SKU123,SupplierCo,1500
-SKU124,GreenProduction,400
-SKU125,,2100
-SKU126,SupplierCo,notanumber
-SKU127,ZeroEmissions,0
+SKU1001,SustainableCo,1800
+SKU1002,GreenProduction,1200
+SKU1003,FutureFoods,950
+SKU1004,SupplierPlus,2100
+SKU1005,ZeroWaste,340
 `;
 
 function mockAuditEngine(rows: AuditRow[]) {
