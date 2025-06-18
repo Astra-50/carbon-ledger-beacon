@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
 function getColor(score: number) {
-  if (score >= 80) return "#22c55e"; // green
-  if (score >= 50) return "#eab308"; // yellow
-  return "#ef4444"; // red
+  if (score >= 80) return "#22c55e";
+  if (score >= 50) return "#eab308";
+  return "#ef4444";
 }
 
 function getLabel(score: number) {
@@ -34,7 +34,6 @@ export default function BadgePage() {
   const borderRadius =
     BADGE_STYLES.find((s) => s.key === style)?.borderRadius || "999px";
 
-  // SVG Badge string
   const badgeSvg = `
   <svg xmlns="http://www.w3.org/2000/svg" width="260" height="64">
     <g>
@@ -51,7 +50,6 @@ export default function BadgePage() {
     badgeSvg
   )}" alt="${company} CSRD Score Badge" />`;
 
-  // Copy functions
   function copyEmbed() {
     navigator.clipboard.writeText(embedCode);
   }
@@ -66,30 +64,30 @@ export default function BadgePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-1 flex flex-col items-center px-4 py-10">
+      <main className="flex-1 flex flex-col items-center px-4 py-6 md:py-10">
         <section className="w-full max-w-xl">
-          <h1 className="text-2xl font-extrabold tracking-tight text-primary mb-2">
+          <h1 className="text-xl md:text-2xl font-extrabold tracking-tight text-primary mb-2">
             Compliance Badge Generator
           </h1>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-sm md:text-base text-muted-foreground mb-4">
             Instantly generate a compliance badge for your company based on your latest CarbonLedger score.
           </p>
           <form
-            className="space-y-4 bg-white rounded-md border shadow p-6"
+            className="space-y-4 bg-white rounded-md border shadow p-4 md:p-6"
             onSubmit={e => e.preventDefault()}
           >
             <div>
-              <Label htmlFor="company">Company name</Label>
+              <Label htmlFor="company" className="text-sm font-medium">Company name</Label>
               <Input
                 id="company"
                 value={company}
                 placeholder="Enter name"
                 onChange={e => setCompany(e.target.value)}
-                className="mt-1"
+                className="mt-1 h-12"
               />
             </div>
             <div>
-              <Label htmlFor="score">CarbonDebt Score</Label>
+              <Label htmlFor="score" className="text-sm font-medium">CarbonDebt Score</Label>
               <input
                 id="score"
                 type="number"
@@ -100,7 +98,7 @@ export default function BadgePage() {
                   setScore(Math.max(0, Math.min(100, Number(e.target.value))))
                 }
                 step={1}
-                className="mt-1 w-full rounded-md border px-3 py-2 text-base bg-white"
+                className="mt-1 w-full rounded-md border px-3 py-3 text-base bg-white h-12"
               />
               <div className="flex items-center gap-2 mt-2">
                 <div
@@ -113,7 +111,7 @@ export default function BadgePage() {
               </div>
             </div>
             <div>
-              <Label>Badge style</Label>
+              <Label className="text-sm font-medium">Badge style</Label>
               <div className="flex gap-2 mt-1">
                 {BADGE_STYLES.map((s) => (
                   <Button
@@ -122,6 +120,7 @@ export default function BadgePage() {
                     size="sm"
                     variant={style === s.key ? "default" : "outline"}
                     onClick={() => setStyle(s.key)}
+                    className="flex-1 py-2"
                   >
                     {s.label}
                   </Button>
@@ -129,12 +128,12 @@ export default function BadgePage() {
               </div>
             </div>
             <div>
-              <Label>Badge preview</Label>
+              <Label className="text-sm font-medium">Badge preview</Label>
               <div className="bg-gray-50 p-4 rounded-md flex flex-col items-center border mt-2">
                 <div
                   dangerouslySetInnerHTML={{ __html: badgeSvg }}
                   aria-label="Badge preview"
-                  style={{ width: 260, height: 64 }}
+                  className="w-full max-w-[260px] h-16"
                   ref={svgRef as any}
                 />
                 <div className="text-xs text-muted-foreground mt-2">
@@ -143,9 +142,9 @@ export default function BadgePage() {
               </div>
             </div>
             <div>
-              <Label>Export & Embed</Label>
-              <div className="flex flex-wrap gap-2 mt-1">
-                <Button size="sm" onClick={downloadSVG} type="button">
+              <Label className="text-sm font-medium">Export & Embed</Label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1">
+                <Button size="sm" onClick={downloadSVG} type="button" className="py-3">
                   Download SVG
                 </Button>
                 <Button
@@ -155,6 +154,7 @@ export default function BadgePage() {
                     alert("PNG download is coming soon!");
                   }}
                   variant="outline"
+                  className="py-3"
                 >
                   Download PNG
                 </Button>
@@ -163,13 +163,14 @@ export default function BadgePage() {
                   type="button"
                   onClick={copyEmbed}
                   variant="secondary"
+                  className="py-3"
                 >
                   Copy embed code
                 </Button>
               </div>
               <Textarea
                 className="mt-2 text-xs bg-gray-100"
-                rows={2}
+                rows={3}
                 readOnly
                 value={embedCode}
                 onFocus={e => e.currentTarget.select()}

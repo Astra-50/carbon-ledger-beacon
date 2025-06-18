@@ -1,11 +1,10 @@
+
 import Navbar from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
 import { useRef, useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import AuditResults from "@/components/AuditResults";
-import { parseCsv, AuditRow } from "@/utils/parseCsv";
-import UploadPanel from "@/components/UploadPanel";
+import { parseCsv } from "@/utils/parseCsv";
+import MobileUploadPanel from "@/components/MobileUploadPanel";
 import { mockAuditEngine } from "@/utils/mockAuditEngine";
 
 const SAMPLE_CSV = `SKU,Supplier,Emissions (kg CO₂e)
@@ -21,9 +20,8 @@ export default function UploadPage() {
   const [results, setResults] = useState<ReturnType<typeof mockAuditEngine> | null>(null);
   const [processing, setProcessing] = useState(false);
   const [fileName, setFileName] = useState<string | undefined>(undefined);
-  const [fileInputKey, setFileInputKey] = useState<number>(0); // for clearing input value
+  const [fileInputKey, setFileInputKey] = useState<number>(0);
 
-  // Handlers
   const handleButtonClick = () => {
     document.querySelector<HTMLInputElement>('input[type="file"][data-testid="csv-input"]')?.click();
   };
@@ -58,7 +56,6 @@ export default function UploadPage() {
         setProcessing(false);
         return;
       }
-      // Run mock "audit"
       const r = mockAuditEngine(parsed.rows);
       setResults(r);
       toast({
@@ -76,35 +73,35 @@ export default function UploadPage() {
       setProcessing(false);
     };
     reader.readAsText(file);
-    setFileInputKey(k => k + 1); // reset input after upload
+    setFileInputKey(k => k + 1);
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-1 flex flex-col items-center justify-start px-4 py-12">
-        <div className="max-w-xl w-full text-center mb-10">
-          <h1 className="text-3xl font-extrabold text-primary mb-2">
+      <main className="flex-1 flex flex-col items-center justify-start px-4 py-8 md:py-12">
+        <div className="max-w-xl w-full text-center mb-8 md:mb-10">
+          <h1 className="text-2xl md:text-3xl font-extrabold text-primary mb-2">
             Upload your data for instant CSRD audit
           </h1>
-          <p className="text-base text-muted-foreground mb-4">
+          <p className="text-sm md:text-base text-muted-foreground mb-4 px-2">
             Upload a CSV file with your product SKUs and supplier emissions. Our engine flags violations and estimates your regulatory risk—no signup required.
           </p>
         </div>
-        <UploadPanel
+        <MobileUploadPanel
           processing={processing}
           onFileChange={handleFileChange}
           onSampleDownload={handleSampleDownload}
           onButtonClick={handleButtonClick}
         />
-        <div className="w-full max-w-xl mt-10 min-h-[80px]">
+        <div className="w-full max-w-xl mt-8 md:mt-10 min-h-[80px]">
           {processing ? (
             <div className="text-center text-muted-foreground animate-pulse">Auditing your CSV data...</div>
           ) : (
             <AuditResults results={results} fileName={fileName} />
           )}
           {!processing && !results && (
-            <div className="text-center text-gray-400 italic">
+            <div className="text-center text-gray-400 italic text-sm">
               After uploading, your audit results will appear here.
             </div>
           )}

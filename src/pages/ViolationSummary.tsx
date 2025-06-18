@@ -30,53 +30,55 @@ const mockViolations = [
 
 export default function ViolationSummary() {
   const handleExport = () => {
-    // For MVP, just alert the export action (implement real export later)
     alert("Exporting violation report...");
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Navbar />
-      <main className="flex-1 flex flex-col items-center px-4 py-10">
-        <div className="w-full max-w-3xl">
-          <h1 className="text-2xl font-extrabold tracking-tight text-primary mb-2">
+      <main className="flex-1 flex flex-col items-center px-4 py-6 md:py-10">
+        <div className="w-full max-w-4xl">
+          <h1 className="text-xl md:text-2xl font-extrabold tracking-tight text-primary mb-2">
             Violation Summary Report
           </h1>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-sm md:text-base text-muted-foreground mb-4">
             Review details about CSRD rule violations detected in your latest audit. Export this report to share with your compliance or sustainability team.
           </p>
-          <Button className="mb-4 flex items-center gap-2" onClick={handleExport}>
+          <Button 
+            className="mb-4 flex items-center gap-2 w-full sm:w-auto" 
+            onClick={handleExport}
+          >
             <Download className="w-4 h-4" /> Export Report (CSV)
           </Button>
           <div className="overflow-x-auto rounded-md bg-white border shadow">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>Supplier</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Severity</TableHead>
+                  <TableHead className="min-w-[80px]">SKU</TableHead>
+                  <TableHead className="min-w-[100px]">Supplier</TableHead>
+                  <TableHead className="min-w-[120px]">Category</TableHead>
+                  <TableHead className="min-w-[200px]">Description</TableHead>
+                  <TableHead className="min-w-[80px]">Severity</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {mockViolations.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-gray-400">
+                    <TableCell colSpan={5} className="text-center text-gray-400 py-8">
                       No violations found 🎉
                     </TableCell>
                   </TableRow>
                 ) : (
                   mockViolations.map((v, idx) => (
                     <TableRow key={idx}>
-                      <TableCell>{v.sku}</TableCell>
+                      <TableCell className="font-medium">{v.sku}</TableCell>
                       <TableCell>
                         {v.supplier || (
                           <span className="italic text-muted-foreground">—</span>
                         )}
                       </TableCell>
                       <TableCell>{v.category}</TableCell>
-                      <TableCell>{v.reason}</TableCell>
+                      <TableCell className="text-sm">{v.reason}</TableCell>
                       <TableCell>
                         <span
                           className={
@@ -101,4 +103,3 @@ export default function ViolationSummary() {
     </div>
   );
 }
-
